@@ -500,8 +500,8 @@ Patrocinador 3`
                     // Se forem IGUAIS, os dados padrão não mudaram. É seguro carregar os dados do usuário.
                     // Se forem DIFERENTES, o programador atualizou o código. Ignore o cache antigo.
                     if (data.defaultHash === currentDefaultHash) {
-                        cultoTitleInput.value = data.title || 'Culto - Manhã';
-                        startTimeInput.value = data.startTime || '09:55';
+                        cultoTitleInput.value = data.title || 'Dia - Turno';
+                        startTimeInput.value = data.startTime || '19:00';
                         if (data.items && Array.isArray(data.items)) {
                             scheduleData = data.items;
                         }
