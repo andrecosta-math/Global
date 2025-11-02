@@ -459,10 +459,10 @@ Patrocinador 3`
                     startTime: startTimeInput.value,
                     items: scheduleData
                 };
-                localStorage.setItem('cultoSchedule', JSON.stringify(dataToSave));
+                localStorage.setItem('confSchedule', JSON.stringify(dataToSave));
             }
             function loadFromLocalStorage() {
-                const savedData = localStorage.getItem('cultoSchedule');
+                const savedData = localStorage.getItem('confSchedule');
                 if (savedData) {
                     const data = JSON.parse(savedData);
             
