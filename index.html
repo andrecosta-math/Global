@@ -427,14 +427,14 @@ Patrocinador 3`
                     startTime: startTimeInput.value,
                     items: scheduleData
                 };
-                localStorage.setItem('cultoSchedule', JSON.stringify(dataToSave));
+                localStorage.setItem('confSchedule', JSON.stringify(dataToSave));
             }
             function loadFromLocalStorage() {
-                const savedData = localStorage.getItem('cultoSchedule');
+                const savedData = localStorage.getItem('confSchedule');
                 if (savedData) {
                     const data = JSON.parse(savedData);
-                    cultoTitleInput.value = data.title || 'Culto - Manhã';
-                    startTimeInput.value = data.startTime || '09:55';
+                    cultoTitleInput.value = data.title || 'Dia - Turno';
+                    startTimeInput.value = data.startTime || '19:00';
                     if (data.items && Array.isArray(data.items)) {
                         scheduleData = data.items;
                     }
