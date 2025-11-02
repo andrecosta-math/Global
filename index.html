@@ -4,22 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conferência Global</title>
-    <script>
-        // Adiciona timestamp a todos os recursos
-        document.addEventListener('DOMContentLoaded', function() {
-            const links = document.querySelectorAll('link[rel="stylesheet"]');
-            const scripts = document.querySelectorAll('script[src]');
-            const version = new Date().getTime();
-            
-            links.forEach(link => {
-                link.href = link.href + '?v=' + version;
-            });
-            
-            scripts.forEach(script => {
-                script.src = script.src + '?v=' + version;
-            });
-        });
-    </script>
     <style>
         /* --- GERAIS --- */
         :root {
