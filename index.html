@@ -422,21 +422,89 @@ Patrocinador 3`
                 scheduleData = newData;
             }
             function saveToLocalStorage() {
+                // Cria uma assinatura (hash) dos dados padrão ATUAIS no código.
+                const defaultDataHash = JSON.stringify([
+                    { title: 'Video patrocinadores', responsible: 'Mídia', durationMinutes: 23 },
+                    { title: 'Vídeo introdutório', responsible: 'Mídia', durationMinutes: 5 },
+                    { title: 'Video institucional', responsible: 'Mídia', durationMinutes: 2 },
+                    { 
+                        title: 'Louvor', 
+                        responsible: 'Líder de Louvor', 
+                        durationMinutes: 30, 
+                        description: `Música 1
+            Música 2
+            Música 3`
+                    },
+                    { title: 'Oferta', responsible: 'Introdutor', durationMinutes: 10 },
+                    { 
+                        title: 'Patrocinadores', 
+                        responsible: 'Introdutor e Mídia', 
+                        durationMinutes: 20, 
+                        description: `Patrocinador 1
+            Patrocinador 2
+            Patrocinador 3`
+                    },
+                    { title: 'Vídeo do Ministro 1', responsible: 'Mídia', durationMinutes: 0 }, 
+                    { title: 'Palavra', responsible: 'Ministro 1', durationMinutes: 40 },
+                    { title: 'Intervalo', responsible: 'Introdutor', durationMinutes: 10 },
+                    { title: 'Vídeo do Ministro 2', responsible: 'Mídia', durationMinutes: 0 }, 
+                    { title: 'Palavra', responsible: 'Ministro 2', durationMinutes: 40 },
+                    { title: 'Finalização', responsible: 'Ministro 2', durationMinutes: 0 },
+                ]);
+            
                 const dataToSave = {
+                    // Salva a assinatura junto com os dados do usuário
+                    defaultHash: defaultDataHash,
                     title: cultoTitleInput.value,
                     startTime: startTimeInput.value,
                     items: scheduleData
                 };
-                localStorage.setItem('confSchedule', JSON.stringify(dataToSave));
+                localStorage.setItem('cultoSchedule', JSON.stringify(dataToSave));
             }
             function loadFromLocalStorage() {
-                const savedData = localStorage.getItem('confSchedule');
+                const savedData = localStorage.getItem('cultoSchedule');
                 if (savedData) {
                     const data = JSON.parse(savedData);
-                    cultoTitleInput.value = data.title || 'Dia - Turno';
-                    startTimeInput.value = data.startTime || '19:00';
-                    if (data.items && Array.isArray(data.items)) {
-                        scheduleData = data.items;
+            
+                    // Cria uma assinatura (hash) dos dados padrão ATUAIS no código.
+                    const currentDefaultHash = JSON.stringify([
+                        { title: 'Video patrocinadores', responsible: 'Mídia', durationMinutes: 23 },
+                        { title: 'Vídeo introdutório', responsible: 'Mídia', durationMinutes: 5 },
+                        { title: 'Video institucional', responsible: 'Mídia', durationMinutes: 2 },
+                        { 
+                            title: 'Louvor', 
+                            responsible: 'Líder de Louvor', 
+                            durationMinutes: 30, 
+                            description: `Música 1
+            Música 2
+            Música 3`
+                        },
+                        { title: 'Oferta', responsible: 'Introdutor', durationMinutes: 10 },
+                        { 
+                            title: 'Patrocinadores', 
+                            responsible: 'Introdutor e Mídia', 
+                            durationMinutes: 20, 
+                            description: `Patrocinador 1
+            Patrocinador 2
+            Patrocinador 3`
+                        },
+                        { title: 'Vídeo do Ministro 1', responsible: 'Mídia', durationMinutes: 0 }, 
+                        { title: 'Palavra', responsible: 'Ministro 1', durationMinutes: 40 },
+                        { title: 'Intervalo', responsible: 'Introdutor', durationMinutes: 10 },
+                        { title: 'Vídeo do Ministro 2', responsible: 'Mídia', durationMinutes: 0 }, 
+                        { title: 'Palavra', responsible: 'Ministro 2', durationMinutes: 40 },
+                        { title: 'Finalização', responsible: 'Ministro 2', durationMinutes: 0 },
+                    ]);
+            
+                    // Compara a assinatura salva com a assinatura atual.
+                    // Se forem IGUAIS, os dados padrão não mudaram. É seguro carregar os dados do usuário.
+                    // Se forem DIFERENTES, o programador atualizou o código. Ignore o cache antigo.
+                    if (data.defaultHash === currentDefaultHash) {
+                        cultoTitleInput.value = data.title || 'Culto - Manhã';
+                        startTimeInput.value = data.startTime || '09:55';
+                        if (data.items && Array.isArray(data.items)) {
+                            scheduleData = data.items;
+                        }
                     }
                 }
             }
