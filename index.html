@@ -268,9 +268,9 @@
             <!-- Os itens do cronograma serão inseridos aqui pelo JavaScript -->
         </ul>
         <div class="action-buttons">
-            <button class="btn" id="add-simple-item-btn">Adicionar Item Simples</button>
-            <button class="btn btn-secondary" id="add-detailed-item-btn">Adicionar Item Detalhado</button>
-            <button class="btn btn-export" id="export-btn">📸 Exportar como Imagem</button>
+            <button class="btn" id="add-simple-item-btn">+ Item Simples</button>
+            <button class="btn btn-secondary" id="add-detailed-item-btn">+ Item Detalhado</button>
+            <button class="btn btn-export" id="export-btn">Exportar Imagem</button>
         </div>
     </main>
     <!-- Contêiner oculto para gerar a imagem de exportação -->
@@ -598,7 +598,7 @@ Patrocinador 3`
                     requestAnimationFrame(() => {
                         const respWidth = responsibleSpan.offsetWidth || 0;
                         // adiciona 24px de margem extra para folga (padding interno + segurança)
-                        itemDiv.style.paddingRight = `${respWidth + 10}px`;
+                        itemDiv.style.paddingRight = `${respWidth + 15}px`;
 
                         // Caso haja descrição abaixo, evite que ela encoste na área do responsável:
                         // (a descrição usa paddingLeft no seu código; aqui garantimos paddingRight similar)
@@ -640,7 +640,7 @@ Patrocinador 3`
                         backgroundColor: '#ffffff',
                         logging: false,
                     });
-                    
+
                     canvas.toBlob(async (blob) => {
                     try {
                         const title = cultoTitleInput.value || 'Cronograma';
