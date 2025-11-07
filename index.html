@@ -1,5 +1,4 @@
-<!-- index.html is the secure copy, this one is to experimentation of improvements of the export feature  -->
- <!--i've changed the input of "scale" in line 594-->
+<!-- index-original.html is the secure copy, this one is to experimentation of improvements of the export feature  -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -641,19 +640,51 @@ Patrocinador 3`
                         backgroundColor: '#ffffff',
                         logging: false,
                     });
-
-                    canvas.toBlob((blob) => {
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
+                    
+                    canvas.toBlob(async (blob) => {
+                    try {
                         const title = cultoTitleInput.value || 'Cronograma';
                         const date = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+                        const filename = `${title}_${date}.png`;
+
+                        // Cria um File a partir do Blob
+                        const file = new File([blob], filename, { type: blob.type });
+
+                        // Tenta usar Web Share API com arquivos (se suportado)
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: title,
+                            text: 'Cronograma exportado',
+                        });
+                        return; // já compartilhou, fim do fluxo
+                        }
+
+                        // Fallback: tentamos baixar (se o navegador suportar download)
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
                         a.href = url;
-                        a.download = `${title}_${date}.png`;
+                        a.download = filename;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
+
+                    } catch (err) {
+                        console.error('Erro ao compartilhar/baixar a imagem:', err);
+                        alert('Não foi possível compartilhar automaticamente. A imagem será baixada.');
+                        // fallback definitivo: forçar download
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${cultoTitleInput.value || 'Cronograma'}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }
                     }, 'image/png');
+
 
                 } catch (error) {
                     console.error('Erro ao exportar imagem:', error);
