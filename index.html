@@ -327,10 +327,12 @@ Patrocinador 3`
                 const startTimeValue = startTimeInput.value;
                 if (!startTimeValue) return;
                 let currentTime = new Date(`1970-01-01T${startTimeValue}:00`);                
+
                 scheduleData.forEach((item, index) => {
                     const li = document.createElement('li');
                     li.className = 'schedule-item';
                     li.dataset.index = index;
+                    
                     const timeDisplay = document.createElement('span');
                     timeDisplay.className = 'time-display';
                     timeDisplay.textContent = `${formatTime(currentTime)}h`;
