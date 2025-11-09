@@ -473,10 +473,10 @@ Patrocinador 3`
                     startTime: startTimeInput.value,
                     items: scheduleData
                 };
-                localStorage.setItem('confSchedule', JSON.stringify(dataToSave));
+                localStorage.setItem('globalSchedule', JSON.stringify(dataToSave));
             }
             function loadFromLocalStorage() {
-                const savedData = localStorage.getItem('confSchedule');
+                const savedData = localStorage.getItem('globalSchedule');
                 if (savedData) {
                     const data = JSON.parse(savedData);
             
