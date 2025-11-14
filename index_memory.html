@@ -1,0 +1,774 @@
+<!-- this will be the perfect version, but it load from the cache of the user  -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conferência Global</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* --- GERAIS --- */
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --card-background-color: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --hover-bg-color: #e9ecef;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --time: #eb0000;
+            --responsible:  #4a6fa5;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 5px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--card-background-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0px;
+            margin-bottom: 0px;
+        }
+        header h1 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        header h5 {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        /* --- CONTROLES GLOBAIS --- */
+        .global-controls h6 {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .global-controls {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 5px;
+            align-items: center;
+            padding: 1px;
+            background-color: var(--background-color);
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        .global-controls label {
+            font-weight: bold;
+        }
+        .global-controls input {
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.75em;
+            min-width: 0;
+        }
+        .global-controls input[type="text"] {
+            flex-grow: 0;
+        }
+        .global-controls input[type="text"], .global-controls textarea {
+            border: 1px solid var(--border-color);
+            padding: 5px;
+            border-radius: 4px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-size: 0.65em;
+            width: 20%;
+        }
+        /* --- LISTA DE ITENS --- */
+        #schedule-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .schedule-item {
+            background: var(--card-background-color);
+            border: 1px solid var(--border-color);
+            padding: 3px;
+            margin-bottom: 3px;
+            border-radius: 5px;
+            display: flex;
+            align-items: flex-start;
+            gap: 5px;
+            transition: box-shadow 0.2s ease-in-out;
+        }
+        .schedule-item:hover {
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        /* --- ESTILOS PARA O NOVO CONTROLE DE REORDENAÇÃO --- */
+        .reorder-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-self: flex-start;
+            padding-top: 2px;
+        }
+        .reorder-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: 0;
+            font-size: 0.2em;
+            line-height: 0.9;
+            transition: color 0.2s, transform 0.1s;
+        }
+        .reorder-btn:hover:not(:disabled) {
+            color: var(--primary-color);
+            transform: scale(1.2);
+        }
+        .reorder-btn:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .time-display {
+            font-weight: bold;
+            font-size: 0.7em;
+            color: var(--time);
+            min-width: 5px;
+            text-align: right;
+            flex-shrink: 0;
+            padding-top: 4px;
+        }
+        .item-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0px;
+            min-width: 0;
+        }
+        .item-main-fields {
+            display: flex;
+            gap: 5px;
+            flex-wrap: nowrap;
+        }
+        .item-details input, .item-details textarea {
+            border: 1px solid var(--border-color);
+            padding: 5px;
+            border-radius: 4px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-size: 0.7em;
+        }
+        .item-details input:focus, .item-details textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.25);
+        }
+        .item-details input.title {
+            font-weight: bold;
+            flex-grow: 1;
+            min-width: 0;
+        }
+        .item-details input.responsible {
+            flex: 1 1 110px;
+            font-style: italic;
+            color: var(--responsible);
+            min-width: 0;
+        }
+        .item-details input.duration {
+            flex: 0 1 20px;
+            text-align: center;
+            min-width: 0;
+        }
+        .description-container {
+            margin-top: 5px;
+        }
+        .description-label {
+            font-size: 0.4em;
+            color: var(--secondary-color);
+            margin-bottom: 1px;
+            display: block;
+        }
+        .item-details .description-textarea {
+            width: 100%;
+            min-height: 100px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            font-weight: bold;
+            font-size: 0.65em;
+            resize: vertical;
+            background-color: #f8f9fa;
+            box-sizing: border-box;
+        }
+        .delete-item {
+            background-color: #eb0000;
+            color: white;
+            border: none;
+            padding: 0px 1px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            align-self: flex-start;
+            margin-top: 0px;
+            flex-shrink: 0;
+        }
+        .delete-item:hover {
+            background-color: #c82333;
+        }
+        .action-buttons {
+            margin-top: 5px;
+            text-align: center;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.7em;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        .btn:hover {
+            background-color: #3a5a80;
+        }
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-export {
+            background-color: #28a745;
+        }
+        .btn-export:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h5>Conferência Global</h5>
+        </header>
+        <section class="global-controls">
+            <h6 for="culto-title">Sessão:</h6>
+            <input type="text" id="culto-title" value="Dia - Turno">
+            <h6 for="start-time">Horário de Início:</h6>
+            <input type="time" id="start-time" value="19:00">
+        </section>
+        <ul id="schedule-list">
+            <!-- Os itens do cronograma serão inseridos aqui pelo JavaScript -->
+        </ul>
+        <div class="action-buttons">
+            <button class="btn" id="add-simple-item-btn">+ Item Simples</button>
+            <button class="btn btn-secondary" id="add-detailed-item-btn">+ Item Detalhado</button>
+            <button class="btn btn-export" id="export-btn">Enviar</button>
+        </div>
+    </main>
+    <!-- Contêiner oculto para gerar a imagem de exportação -->
+    <div id="export-container" style="position: absolute; left: -9999px; top: 0; background: white; padding: 20px; font-family: sans-serif;"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- ELEMENTOS DO DOM ---
+            const scheduleList = document.getElementById('schedule-list');
+            const cultoTitleInput = document.getElementById('culto-title');
+            const startTimeInput = document.getElementById('start-time');
+            const addSimpleItemBtn = document.getElementById('add-simple-item-btn');
+            const addDetailedItemBtn = document.getElementById('add-detailed-item-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const exportContainer = document.getElementById('export-container');            
+            let scheduleData = [
+                { title: 'Vídeo patrocinadores', responsible: 'Mídia', durationMinutes: 23 },
+                { title: 'Vídeo introdutório', responsible: 'Mídia', durationMinutes: 5 },
+                { title: 'Vídeo institucional', responsible: 'Mídia', durationMinutes: 2 },
+                { 
+                    title: 'Louvor', 
+                    responsible: 'Líder de Louvor', 
+                    durationMinutes: 30, 
+                    description: `Música 1
+Música 2
+Música 3`
+                },
+                { title: 'Oferta', responsible: 'Introdutor', durationMinutes: 10 },
+                { 
+                    title: 'Patrocinadores', 
+                    responsible: 'Introdutor e Mídia', 
+                    durationMinutes: 20, 
+                    description: `Patrocinador 1
+Patrocinador 2
+Patrocinador 3`
+                },
+                { title: 'Vídeo do Ministro 1', responsible: 'Mídia', durationMinutes: 0 }, 
+                { title: 'Palavra', responsible: 'Ministro 1', durationMinutes: 40 },
+                { title: 'Intervalo', responsible: 'Introdutor', durationMinutes: 10 },
+                { title: 'Vídeo do Ministro 2', responsible: 'Mídia', durationMinutes: 0 }, 
+                { title: 'Palavra', responsible: 'Ministro 2', durationMinutes: 40 },
+                { title: 'Finalização', responsible: 'Ministro 2', durationMinutes: 0 },
+            ];
+            // --- FUNÇÕES ---
+            function formatTime(date) {
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+            function addMinutes(date, minutes) {
+                return new Date(date.getTime() + minutes * 60000);
+            }
+            function renderSchedule() {
+                scheduleList.innerHTML = '';
+                const startTimeValue = startTimeInput.value;
+                if (!startTimeValue) return;
+                let currentTime = new Date(`1970-01-01T${startTimeValue}:00`);                
+
+                scheduleData.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'schedule-item';
+                    li.dataset.index = index;
+                    
+                    const timeDisplay = document.createElement('span');
+                    timeDisplay.className = 'time-display';
+                    timeDisplay.textContent = `${formatTime(currentTime)}h`;
+
+                    const itemDetails = document.createElement('div');
+                    itemDetails.className = 'item-details';
+                    
+                    const itemMainFields = document.createElement('div');
+                    itemMainFields.className = 'item-main-fields';
+                    
+                    const titleInput = document.createElement('input');
+                    titleInput.type = 'text';
+                    titleInput.className = 'title';
+                    titleInput.value = item.title;
+                    titleInput.placeholder = 'Título da Ação';
+                    
+                    const responsibleInput = document.createElement('input');
+                    responsibleInput.type = 'text';
+                    responsibleInput.className = 'responsible';
+                    responsibleInput.value = item.responsible;
+                    responsibleInput.placeholder = 'Responsável';
+                    
+                    const durationInput = document.createElement('input');
+                    durationInput.type = 'number';
+                    durationInput.className = 'duration';
+                    durationInput.value = item.durationMinutes;
+                    durationInput.min = '0';
+                    durationInput.placeholder = 'Duração (min)';
+                    
+                    itemMainFields.appendChild(titleInput);
+                    itemMainFields.appendChild(responsibleInput);
+                    itemMainFields.appendChild(durationInput);
+                    itemDetails.appendChild(itemMainFields);
+
+                    if (item.description !== undefined) {
+                        const descriptionContainer = document.createElement('div');
+                        descriptionContainer.className = 'description-container';
+                        const label = document.createElement('span');
+                        label.className = 'description-label';
+                        label.textContent = 'Descrição Detalhada:';
+                        descriptionContainer.appendChild(label);
+                        const descriptionTextarea = document.createElement('textarea');
+                        descriptionTextarea.className = 'description-textarea';
+                        descriptionTextarea.value = item.description;
+                        descriptionContainer.appendChild(descriptionTextarea);
+                        itemDetails.appendChild(descriptionContainer);
+                    }
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-item';
+                    deleteBtn.textContent = '-';
+
+                    // --- NOVO CONTROLE DE REORDENAÇÃO ---
+                    const reorderControls = document.createElement('div');
+                    reorderControls.className = 'reorder-controls';
+
+                    const moveUpBtn = document.createElement('button');
+                    moveUpBtn.className = 'reorder-btn';
+                    moveUpBtn.innerHTML = '▲';
+                    moveUpBtn.title = 'Mover para cima';
+                    if (index === 0) {
+                        moveUpBtn.disabled = true;
+                    }
+
+                    const moveDownBtn = document.createElement('button');
+                    moveDownBtn.className = 'reorder-btn';
+                    moveDownBtn.innerHTML = '▼';
+                    moveDownBtn.title = 'Mover para baixo';
+                    if (index === scheduleData.length - 1) {
+                        moveDownBtn.disabled = true;
+                    }
+
+                    reorderControls.appendChild(moveUpBtn);
+                    reorderControls.appendChild(moveDownBtn);
+
+                    // Montando o item da lista
+                    li.appendChild(reorderControls); // Substitui o drag-handle
+                    li.appendChild(timeDisplay);
+                    li.appendChild(itemDetails);
+                    li.appendChild(deleteBtn);
+                    
+                    scheduleList.appendChild(li);
+                    
+                    currentTime = addMinutes(currentTime, item.durationMinutes);
+                });
+            }
+            function updateDataFromInputs() {
+                const items = document.querySelectorAll('.schedule-item');
+                const newData = [];
+                items.forEach(itemElement => {
+                    const title = itemElement.querySelector('.title').value;
+                    const responsible = itemElement.querySelector('.responsible').value;
+                    const duration = parseInt(itemElement.querySelector('.duration').value) || 0;
+                    const currentItemData = { title, responsible, durationMinutes: duration };
+                    const descriptionTextarea = itemElement.querySelector('.description-textarea');
+                    if (descriptionTextarea) {
+                        currentItemData.description = descriptionTextarea.value;
+                    }
+                    newData.push(currentItemData);
+                });
+                scheduleData = newData;
+            }
+            function saveToLocalStorage() {
+                // Cria uma assinatura (hash) dos dados padrão ATUAIS no código.
+                const defaultDataHash = JSON.stringify([
+                { title: 'Vídeo patrocinadores', responsible: 'Mídia', durationMinutes: 23 },
+                { title: 'Vídeo introdutório', responsible: 'Mídia', durationMinutes: 5 },
+                { title: 'Vídeo institucional', responsible: 'Mídia', durationMinutes: 2 },
+                { 
+                    title: 'Louvor', 
+                    responsible: 'Líder de Louvor', 
+                    durationMinutes: 30, 
+                    description: `Música 1
+Música 2
+Música 3`
+                },
+                { title: 'Oferta', responsible: 'Introdutor', durationMinutes: 10 },
+                { 
+                    title: 'Patrocinadores', 
+                    responsible: 'Introdutor e Mídia', 
+                    durationMinutes: 20, 
+                    description: `Patrocinador 1
+Patrocinador 2
+Patrocinador 3`
+                },
+                { title: 'Vídeo do Ministro 1', responsible: 'Mídia', durationMinutes: 0 }, 
+                { title: 'Palavra', responsible: 'Ministro 1', durationMinutes: 40 },
+                { title: 'Intervalo', responsible: 'Introdutor', durationMinutes: 10 },
+                { title: 'Vídeo do Ministro 2', responsible: 'Mídia', durationMinutes: 0 }, 
+                { title: 'Palavra', responsible: 'Ministro 2', durationMinutes: 40 },
+                { title: 'Finalização', responsible: 'Ministro 2', durationMinutes: 0 },
+            ]);
+            
+                const dataToSave = {
+                    // Salva a assinatura junto com os dados do usuário
+                    defaultHash: defaultDataHash,
+                    title: cultoTitleInput.value,
+                    startTime: startTimeInput.value,
+                    items: scheduleData
+                };
+                localStorage.setItem('confSchedule', JSON.stringify(dataToSave));
+            }
+            function loadFromLocalStorage() {
+                const savedData = localStorage.getItem('confSchedule');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+            
+                    // Cria uma assinatura (hash) dos dados padrão ATUAIS no código.
+                    const currentDefaultHash = JSON.stringify([
+                        { title: 'Vídeo patrocinadores', responsible: 'Mídia', durationMinutes: 23 },
+                        { title: 'Vídeo introdutório', responsible: 'Mídia', durationMinutes: 5 },
+                        { title: 'Vídeo institucional', responsible: 'Mídia', durationMinutes: 2 },
+                        { 
+                            title: 'Louvor', 
+                            responsible: 'Líder de Louvor', 
+                            durationMinutes: 30, 
+                            description: `Música 1
+        Música 2
+        Música 3`
+                        },
+                        { title: 'Oferta', responsible: 'Introdutor', durationMinutes: 10 },
+                        { 
+                            title: 'Patrocinadores', 
+                            responsible: 'Introdutor e Mídia', 
+                            durationMinutes: 20, 
+                            description: `Patrocinador 1
+        Patrocinador 2
+        Patrocinador 3`
+                        },
+                        { title: 'Vídeo do Ministro 1', responsible: 'Mídia', durationMinutes: 0 }, 
+                        { title: 'Palavra', responsible: 'Ministro 1', durationMinutes: 40 },
+                        { title: 'Intervalo', responsible: 'Introdutor', durationMinutes: 10 },
+                        { title: 'Vídeo do Ministro 2', responsible: 'Mídia', durationMinutes: 0 }, 
+                        { title: 'Palavra', responsible: 'Ministro 2', durationMinutes: 40 },
+                        { title: 'Finalização', responsible: 'Ministro 2', durationMinutes: 0 },
+                    ]);
+            
+                    // Compara a assinatura salva com a assinatura atual.
+                    // Se forem IGUAIS, os dados padrão não mudaram. É seguro carregar os dados do usuário.
+                    // Se forem DIFERENTES, o programador atualizou o código. Ignore o cache antigo.
+                    if (data.defaultHash === currentDefaultHash) {
+                        cultoTitleInput.value = data.title || 'Dia - Turno';
+                        startTimeInput.value = data.startTime || '19:00';
+                        if (data.items && Array.isArray(data.items)) {
+                            scheduleData = data.items;
+                        }
+                    }
+                }
+            }
+            function reorderSchedule(fromIndex, toIndex) {
+                if (fromIndex === toIndex) return;
+                const itemToMove = scheduleData.splice(fromIndex, 1)[0];
+                scheduleData.splice(toIndex, 0, itemToMove);
+            }
+            // --- FUNÇÃO DE EXPORTAÇÃO REESCRITA ---
+            async function exportAsImage() {
+                updateDataFromInputs(); // Garante que os dados estejam atualizados
+
+                // 1. Limpa o contêiner de exportação
+                exportContainer.innerHTML = '';
+
+                // 2. Cria a estrutura HTML para exportação
+                const exportHeader = document.createElement('h3');
+                exportHeader.textContent = `Cronograma: ${cultoTitleInput.value}`;
+                exportHeader.style.marginBottom = '10px';
+                exportHeader.style.textAlign = 'center';
+                exportHeader.style.color = '#333';
+
+                const exportInfo = document.createElement('p');
+                exportInfo.style.marginBottom = '20px';
+                exportInfo.style.fontSize = '14px';
+                exportInfo.style.color = '#555';
+
+                const exportList = document.createElement('div');
+                exportList.style.border = '1px solid #ddd';
+                exportList.style.borderRadius = '5px';
+
+                const startTimeValue = startTimeInput.value;
+                let currentTime = new Date(`1970-01-01T${startTimeValue}:00`);
+
+                scheduleData.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.padding = '12px';
+                    itemDiv.style.borderBottom = '1px solid #eee';
+                    itemDiv.style.fontSize = '15px';
+                    itemDiv.style.position = 'relative'; // referência para absolute
+                    // Observe: NÃO definimos paddingRight fixo aqui — será ajustado dinamicamente abaixo
+
+                    const timeSpan = document.createElement('span');
+                    timeSpan.style.fontWeight = 'bold';
+                    timeSpan.style.color = '#eb0000';
+                    timeSpan.style.marginRight = '15px';
+                    timeSpan.style.display = 'inline-block';
+                    timeSpan.style.minWidth = '50px';
+                    timeSpan.textContent = `${formatTime(currentTime)}h`;
+
+                    const titleSpan = document.createElement('span');
+                    titleSpan.style.fontWeight = 'bold';
+                    titleSpan.style.color = '#212529';
+                    titleSpan.style.marginRight = '15px';
+                    // Permitir que o título faça wrap normalmente (sem ellipsis), mas não invadirá a área do responsável
+                    titleSpan.textContent = item.title;
+
+                    // ➕ NOVO SPAN: duração logo após o título
+                    const durationSpan = document.createElement('span');
+                    durationSpan.style.color = '#6c757d';
+                    durationSpan.style.fontStyle = 'italic';
+                    durationSpan.style.fontSize = '14px';
+                    durationSpan.textContent = `${item.durationMinutes} min`;
+                    durationSpan.style.marginRight = '15px';
+
+                    const responsibleSpan = document.createElement('span');
+                    responsibleSpan.style.color = '#4a6fa5';
+                    responsibleSpan.style.fontStyle = 'italic';
+                    responsibleSpan.textContent = `${item.responsible}`;
+
+                    // posiciona o responsável à direita e centraliza verticalmente
+                    responsibleSpan.style.position = 'absolute';
+                    responsibleSpan.style.right = '12px';
+                    responsibleSpan.style.whiteSpace = 'nowrap';
+
+                    // Adiciona os elementos ao item (necessário para medir responsibleSpan)
+                    itemDiv.appendChild(timeSpan);
+                    itemDiv.appendChild(titleSpan);
+                    itemDiv.appendChild(durationSpan);
+                    itemDiv.appendChild(responsibleSpan);
+
+                    // ---------- AJUSTE DINÂMICO: reserva espaço à direita para evitar sobreposição ----------
+                    // Medimos a largura do responsibleSpan depois que ele já está no DOM (renderizado).
+                    // Use requestAnimationFrame para garantir que o navegador tenha feito o layout.
+                    requestAnimationFrame(() => {
+                        const respWidth = responsibleSpan.offsetWidth || 0;
+                        // adiciona 24px de margem extra para folga (padding interno + segurança)
+                        itemDiv.style.paddingRight = `${respWidth + 15}px`;
+
+                        // Caso haja descrição abaixo, evite que ela encoste na área do responsável:
+                        // (a descrição usa paddingLeft no seu código; aqui garantimos paddingRight similar)
+                        const descP = itemDiv.querySelector('p');
+                        if (descP) {
+                            // se já existir, ajusta; caso contrário o bloco abaixo ao criar a descrição
+                            descP.style.paddingRight = `${respWidth + 24}px`;
+                        }
+                    });
+                    // ---------------------------------------------------------------------------------------
+
+                    if (item.description) {
+                        const descP = document.createElement('p');
+                        descP.style.marginTop = '8px';
+                        descP.style.paddingLeft = '65px';
+                        // garante que a descrição também não invada a área direita onde fica o responsável
+                        // será ajustado dinamicamente acima (se necessário), mas colocamos um valor inicial razoável:
+                        descP.style.paddingRight = '40px';
+                        descP.style.color = '#6c757d';
+                        descP.style.fontSize = '13px';
+                        descP.style.whiteSpace = 'pre-line';
+                        descP.textContent = item.description;
+                        itemDiv.appendChild(descP);
+                    }
+
+                    exportList.appendChild(itemDiv);
+                    currentTime = addMinutes(currentTime, item.durationMinutes);
+                });
+
+                exportContainer.appendChild(exportHeader);
+                exportContainer.appendChild(exportInfo);
+                exportContainer.appendChild(exportList);
+
+                // 3. Aguarda um pouco para renderizar e captura com html2canvas
+                await new Promise(resolve => setTimeout(resolve, 100));
+                try {
+                    const canvas = await html2canvas(exportContainer, {
+                        scale: 4, // resolução alta
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                    });
+
+                    canvas.toBlob(async (blob) => {
+                    try {
+                        const title = cultoTitleInput.value || 'Cronograma';
+                        const date = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+                        const filename = `${title}_${date}.png`;
+
+                        // Cria um File a partir do Blob
+                        const file = new File([blob], filename, { type: blob.type });
+
+                        // Tenta usar Web Share API com arquivos (se suportado)
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: title,
+                            text: 'Essa é a versão mais recente do Cronograma!',
+                        });
+                        return; // já compartilhou, fim do fluxo
+                        }
+
+                        // Fallback: tentamos baixar (se o navegador suportar download)
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+
+                    } catch (err) {
+                        console.error('Erro ao compartilhar/baixar a imagem:', err);
+                        alert('Não foi possível compartilhar automaticamente. A imagem será baixada.');
+                        // fallback definitivo: forçar download
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${cultoTitleInput.value || 'Cronograma'}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }
+                    }, 'image/png');
+
+
+                } catch (error) {
+                    console.error('Erro ao exportar imagem:', error);
+                    alert('Ocorreu um erro ao tentar exportar a imagem. Por favor, tente novamente.');
+                } finally {
+                    exportContainer.innerHTML = ''; // Limpa após exportar
+                }
+            }
+            // --- EVENT LISTENERS ---
+            addSimpleItemBtn.addEventListener('click', () => {
+                scheduleData.push({ title: 'Novo Item Simples', responsible: '', durationMinutes: 5 });
+                renderSchedule();
+                saveToLocalStorage();
+            });
+            addDetailedItemBtn.addEventListener('click', () => {
+                scheduleData.push({ title: 'Novo Item Detalhado', responsible: '', durationMinutes: 10, description: '' });
+                renderSchedule();
+                saveToLocalStorage();
+            });
+            startTimeInput.addEventListener('change', () => {
+                renderSchedule();
+                saveToLocalStorage();
+            });
+            exportBtn.addEventListener('click', exportAsImage);
+            scheduleList.addEventListener('focusout', (e) => {
+                if (e.target.matches('.title, .responsible')) {
+                    updateDataFromInputs();
+                    saveToLocalStorage();
+                }
+            });            
+            scheduleList.addEventListener('focusout', (e) => {
+                if (e.target.matches('.title, .responsible')) {
+                    updateDataFromInputs();
+                    saveToLocalStorage();
+                }
+            });
+            scheduleList.addEventListener('change', (e) => {
+                if (e.target.matches('.duration')) {
+                    updateDataFromInputs();
+                    renderSchedule();
+                    saveToLocalStorage();
+                } else if (e.target.matches('.description-textarea')) {
+                     updateDataFromInputs();
+                     saveToLocalStorage();
+                }
+            });
+            // Listener unificado para clique em deletar e reordenar
+            scheduleList.addEventListener('click', (e) => {
+                const li = e.target.closest('.schedule-item');
+                if (!li) return;
+                const index = parseInt(li.dataset.index, 10);
+
+                if (e.target.classList.contains('delete-item')) {
+                    if (confirm('Tem certeza que deseja excluir este item?')) {
+                        scheduleData.splice(index, 1);
+                        renderSchedule();
+                        saveToLocalStorage();
+                    }
+                } else if (e.target.classList.contains('reorder-btn')) {
+                    let newIndex;
+                    if (e.target.innerHTML === '▲' && index > 0) {
+                        newIndex = index - 1;
+                    } else if (e.target.innerHTML === '▼' && index < scheduleData.length - 1) {
+                        newIndex = index + 1;
+                    } else {
+                        return; // Não move se estiver nos limites
+                    }
+                    reorderSchedule(index, newIndex);
+                    renderSchedule();
+                    saveToLocalStorage();
+                }
+            });
+            // --- INICIALIZAÇÃO ---
+            loadFromLocalStorage();
+            renderSchedule();
+        });
+    </script>
+</body>
+</html>
