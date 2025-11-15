@@ -468,6 +468,16 @@ Patrocinador 3`
                 // 1. Limpa o contêiner de exportação
                 exportContainer.innerHTML = '';
 
+                // 🔧 Correção para fonte menor em dispositivos móveis
+                exportContainer.style.webkitTextSizeAdjust = 'none';
+                exportContainer.style.MozTextSizeAdjust = 'none';
+                exportContainer.style.msTextSizeAdjust = 'none';
+                exportContainer.style.textSizeAdjust = 'none';
+                exportContainer.style.fontSize = '15px';
+                exportContainer.style.lineHeight = '1.2';
+                exportContainer.style.wordBreak = 'break-word';
+                exportContainer.style.overflowWrap = 'break-word';
+
                 // 2. Cria a estrutura HTML para exportação
                 const exportHeader = document.createElement('h3');
                 exportHeader.textContent = `Cronograma: ${cultoTitleInput.value}`;
